@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Demo | YourPitchh</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== LOGIN VIEW ===== -->
+<div class="login-wrap" id="login-view">
+  <div class="login-card">
+    <a href="index.html" class="brand">YOUR<span style="color:var(--teal-500);">PITCHH</span></a>
+    <p class="hint">Admin demo panel · client-side simulated login</p>
+    <form id="login-form" novalidate>
+      <div class="field"><label>Admin Email</label><input type="email" id="admin-email" value="admin@yourpitchh.demo" required></div>
+      <div class="field"><label>Password</label><input type="password" id="admin-password" placeholder="demo123" required></div>
+      <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+      <p style="font-size:.76rem; color:var(--text-soft); margin-top:14px; text-align:center;">Demo credentials — any password works. No real authentication or backend is involved.</p>
+    </form>
+  </div>
+</div>
+
+<!-- ===== ADMIN SHELL ===== -->
+<div class="admin-shell" id="admin-shell" style="display:none;">
+  <aside class="admin-sidebar">
+    <a href="index.html" class="brand">YOUR<span style="color:var(--teal-300);">PITCHH</span></a>
+    <nav class="admin-nav">
+      <a href="#" data-panel="dashboard" class="active">📊 Dashboard</a>
+      <a href="#" data-panel="jobs">💼 Jobs</a>
+      <a href="#" data-panel="applications">📄 Applications</a>
+      <a href="#" data-panel="candidates">👥 Candidates</a>
+      <a href="#" data-panel="employers">🏢 Employers</a>
+      <a href="#" data-panel="reviews">⭐ Reviews</a>
+      <a href="#" data-panel="enquiries">✉️ Enquiries</a>
+    </nav>
+    <button class="logout" id="logout-btn">↩ Sign Out</button>
+  </aside>
+
+  <main class="admin-main">
+    <!-- DASHBOARD -->
+    <section class="admin-panel active" id="panel-dashboard">
+      <div class="admin-topbar"><h1>Dashboard</h1><span style="font-size:.8rem; color:var(--text-soft);">Simulated data via localStorage</span></div>
+      <div class="dash-stats">
+        <div class="dash-card"><b data-stat="totalJobs">0</b><span>Total Jobs</span></div>
+        <div class="dash-card"><b data-stat="totalApps">0</b><span>Total Applications</span></div>
+        <div class="dash-card"><b data-stat="totalCandidates">0</b><span>Candidates</span></div>
+        <div class="dash-card"><b data-stat="totalEmployers">0</b><span>Employers</span></div>
+        <div class="dash-card"><b data-stat="pendingApps">0</b><span>Pending Applications</span></div>
+      </div>
+    </section>
+
+    <!-- JOBS -->
+    <section class="admin-panel" id="panel-jobs">
+      <div class="admin-topbar"><h1>Jobs</h1><button class="btn btn-primary btn-sm" id="add-job-btn">+ Add Job</button></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Title</th><th>Company</th><th>Location</th><th>Type</th><th>Posted</th><th>Action</th></tr></thead>
+        <tbody data-jobs-table></tbody>
+      </table></div>
+    </section>
+
+    <!-- APPLICATIONS -->
+    <section class="admin-panel" id="panel-applications">
+      <div class="admin-topbar"><h1>Applications</h1></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Candidate</th><th>Job</th><th>Applied</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody data-applications-table></tbody>
+      </table></div>
+    </section>
+
+    <!-- CANDIDATES -->
+    <section class="admin-panel" id="panel-candidates">
+      <div class="admin-topbar"><h1>Candidates</h1></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Applied Job</th><th>Status</th></tr></thead>
+        <tbody data-candidates-table></tbody>
+      </table></div>
+    </section>
+
+    <!-- EMPLOYERS -->
+    <section class="admin-panel" id="panel-employers">
+      <div class="admin-topbar"><h1>Employers</h1></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Company</th><th>Job Posted</th><th>Contact Email</th></tr></thead>
+        <tbody data-employers-table></tbody>
+      </table></div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="admin-panel" id="panel-reviews">
+      <div class="admin-topbar"><h1>Reviews</h1></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Rating</th><th>Date</th><th>Review</th></tr></thead>
+        <tbody data-reviews-table></tbody>
+      </table></div>
+    </section>
+
+    <!-- ENQUIRIES -->
+    <section class="admin-panel" id="panel-enquiries">
+      <div class="admin-topbar"><h1>Enquiries</h1></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Type</th><th>Phone</th><th>Message</th></tr></thead>
+        <tbody data-enquiries-table></tbody>
+      </table></div>
+    </section>
+  </main>
+</div>
+
+<!-- Add/Edit Job Modal -->
+<div class="modal-overlay" id="job-form-modal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" aria-label="Close">✕</button>
+    <h3 id="job-form-title">Add Job</h3>
+    <form id="admin-job-form" novalidate>
+      <input type="hidden" name="id">
+      <div class="field-row">
+        <div class="field"><label>Job Title</label><input type="text" name="title" required></div>
+        <div class="field"><label>Company</label><input type="text" name="company" required></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Location</label><input type="text" name="location" required></div>
+        <div class="field"><label>Job Type</label>
+          <select name="type" required><option>Full Time</option><option>Part Time</option><option>Contract</option><option>Internship</option></select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Experience</label><input type="text" name="experience" required></div>
+        <div class="field"><label>Salary</label><input type="text" name="salary"></div>
+      </div>
+      <div class="field"><label>Skills (comma separated)</label><input type="text" name="skills" required></div>
+      <div class="field"><label>Description</label><textarea name="description" rows="3" required></textarea></div>
+      <button type="submit" class="btn btn-primary btn-block">Save Job</button>
+    </form>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+(function(){
+  "use strict";
+  const store = window.ypStore;
+
+  const loginView = document.getElementById("login-view");
+  const shell = document.getElementById("admin-shell");
+
+  function isAuthed(){ return sessionStorage.getItem("yp_admin_auth") === "1"; }
+  function showShell(){ loginView.style.display = "none"; shell.style.display = "flex"; renderAll(); }
+  function showLogin(){ loginView.style.display = "flex"; shell.style.display = "none"; }
+
+  if (isAuthed()) showShell(); else showLogin();
+
+  document.getElementById("login-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    sessionStorage.setItem("yp_admin_auth", "1");
+    ypToast("Signed in to admin demo", "success");
+    showShell();
+  });
+  document.getElementById("logout-btn").addEventListener("click", function(){
+    sessionStorage.removeItem("yp_admin_auth");
+    showLogin();
+  });
+
+  // Panel navigation
+  document.querySelectorAll(".admin-nav a").forEach(function(link){
+    link.addEventListener("click", function(e){
+      e.preventDefault();
+      document.querySelectorAll(".admin-nav a").forEach(a => a.classList.remove("active"));
+      link.classList.add("active");
+      const panel = link.getAttribute("data-panel");
+      document.querySelectorAll(".admin-panel").forEach(p => p.classList.remove("active"));
+      document.getElementById("panel-" + panel).classList.add("active");
+    });
+  });
+
+  function esc(str){ const d = document.createElement("div"); d.textContent = str == null ? "" : String(str); return d.innerHTML; }
+  function fmtDate(str){ try { return new Date(str).toLocaleDateString("en-IN", {day:"numeric", month:"short", year:"numeric"}); } catch(e){ return str || "—"; } }
+
+  function renderAll(){
+    const seedJobs = window.ypGetAllJobs ? window.ypGetAllJobs() : [];
+    const postedJobs = store.get("yp_posted_jobs", []);
+    const applications = store.get("yp_applications", []);
+    const enquiries = store.get("yp_enquiries", []);
+    const reviews = [
+      {name:"Harshith Kumar EV", rating:5, date:"2023-11-02", text:"Very positive experience — professional, responsive and supportive team."},
+      {name:"Monisha J Nisha", rating:5, date:"2023-09-18", text:"Great experience! Helped secure a job within just 2 days."},
+      {name:"Demo Reviewer", rating:4, date:"2023-07-04", text:"Sample review placeholder for the prototype."}
+    ];
+
+    // Stats
+    document.querySelector('[data-stat="totalJobs"]').textContent = seedJobs.length;
+    document.querySelector('[data-stat="totalApps"]').textContent = applications.length;
+    document.querySelector('[data-stat="totalCandidates"]').textContent = new Set(applications.map(a => a.email || a.fullName)).size || applications.length;
+    document.querySelector('[data-stat="totalEmployers"]').textContent = postedJobs.length;
+    document.querySelector('[data-stat="pendingApps"]').textContent = applications.filter(a => a.status === "Applied").length;
+
+    // Jobs table
+    document.querySelector("[data-jobs-table]").innerHTML = seedJobs.map(j => `
+      <tr>
+        <td>${esc(j.title)}</td><td>${esc(j.company)}</td><td>${esc(j.location)}</td><td>${esc(j.type)}</td>
+        <td>${fmtDate(j.posted)}</td>
+        <td class="row-actions">
+          <button class="icon-btn" data-edit-job="${j.id}" title="Edit">✎</button>
+          <button class="icon-btn danger" data-delete-job="${j.id}" title="Delete">✕</button>
+        </td>
+      </tr>`).join("") || `<tr><td colspan="6" style="color:var(--text-soft);">No jobs yet.</td></tr>`;
+
+    document.querySelectorAll("[data-delete-job]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-delete-job");
+        let posted = store.get("yp_posted_jobs", []);
+        if (posted.some(j => j.id === id)) {
+          posted = posted.filter(j => j.id !== id);
+          store.set("yp_posted_jobs", posted);
+          ypToast("Job deleted", "success");
+          renderAll();
+        } else {
+          ypToast("Seed demo jobs can't be deleted, only posted jobs can.", "error");
+        }
+      });
+    });
+    document.querySelectorAll("[data-edit-job]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-edit-job");
+        const job = seedJobs.find(j => j.id === id);
+        if (!job) return;
+        const form = document.getElementById("admin-job-form");
+        form.id.value = job.id;
+        form.title.value = job.title;
+        form.company.value = job.company;
+        form.location.value = job.location;
+        form.type.value = job.type;
+        form.experience.value = job.experience;
+        form.salary.value = job.salary;
+        form.skills.value = job.skills.join(", ");
+        form.description.value = job.description;
+        document.getElementById("job-form-title").textContent = "Edit Job";
+        ypOpenModal(document.getElementById("job-form-modal"));
+      });
+    });
+
+    // Applications table
+    document.querySelector("[data-applications-table]").innerHTML = applications.map((a, i) => `
+      <tr>
+        <td>${esc(a.fullName || "—")}</td><td>${esc(a.jobTitle || "—")}</td><td>${fmtDate(a.appliedOn)}</td>
+        <td><span class="status-pill status-${(a.status||"Applied").replace(/\s+/g,"")}">${esc(a.status||"Applied")}</span></td>
+        <td>
+          <select data-app-status="${i}" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border-strong); background:var(--bg);">
+            <option${a.status==="Applied"?" selected":""}>Applied</option>
+            <option${a.status==="Under Review"?" selected":""}>Under Review</option>
+            <option${a.status==="Interview Scheduled"?" selected":""}>Interview Scheduled</option>
+            <option${a.status==="Selected"?" selected":""}>Selected</option>
+            <option${a.status==="Rejected"?" selected":""}>Rejected</option>
+          </select>
+        </td>
+      </tr>`).join("") || `<tr><td colspan="5" style="color:var(--text-soft);">No applications submitted yet in this browser.</td></tr>`;
+
+    document.querySelectorAll("[data-app-status]").forEach(sel => {
+      sel.addEventListener("change", () => {
+        const idx = parseInt(sel.getAttribute("data-app-status"));
+        const apps = store.get("yp_applications", []);
+        apps[idx].status = sel.value;
+        store.set("yp_applications", apps);
+        ypToast("Application status updated", "success");
+        renderAll();
+      });
+    });
+
+    // Candidates (derived from applications)
+    document.querySelector("[data-candidates-table]").innerHTML = applications.map(a => `
+      <tr><td>${esc(a.fullName || "—")}</td><td>${esc(a.jobTitle || "—")}</td>
+      <td><span class="status-pill status-${(a.status||"Applied").replace(/\s+/g,"")}">${esc(a.status||"Applied")}</span></td></tr>
+    `).join("") || `<tr><td colspan="3" style="color:var(--text-soft);">No candidate applications yet in this browser.</td></tr>`;
+
+    // Employers (derived from posted jobs)
+    document.querySelector("[data-employers-table]").innerHTML = postedJobs.map(j => `
+      <tr><td>${esc(j.company)}</td><td>${esc(j.title)}</td><td>${esc(j.contactEmail || "—")}</td></tr>
+    `).join("") || `<tr><td colspan="3" style="color:var(--text-soft);">No employer job posts yet in this browser.</td></tr>`;
+
+    // Reviews (static demo)
+    document.querySelector("[data-reviews-table]").innerHTML = reviews.map(r => `
+      <tr><td>${esc(r.name)}</td><td>${"★".repeat(r.rating)}</td><td>${fmtDate(r.date)}</td><td style="white-space:normal; max-width:340px;">${esc(r.text)}</td></tr>
+    `).join("");
+
+    // Enquiries
+    document.querySelector("[data-enquiries-table]").innerHTML = enquiries.map(e => `
+      <tr><td>${esc(e.name)}</td><td>${esc(e.enquiryType)}</td><td>${esc(e.phone)}</td><td style="white-space:normal; max-width:320px;">${esc(e.message)}</td></tr>
+    `).join("") || `<tr><td colspan="4" style="color:var(--text-soft);">No enquiries submitted yet in this browser.</td></tr>`;
+  }
+
+  document.getElementById("add-job-btn").addEventListener("click", () => {
+    const form = document.getElementById("admin-job-form");
+    form.reset();
+    form.id.value = "";
+    document.getElementById("job-form-title").textContent = "Add Job";
+    ypOpenModal(document.getElementById("job-form-modal"));
+  });
+
+  document.getElementById("admin-job-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form).entries());
+    let posted = store.get("yp_posted_jobs", []);
+    if (data.id) {
+      posted = posted.map(j => j.id === data.id ? {
+        ...j, title:data.title, company:data.company, location:data.location, type:data.type,
+        experience:data.experience, salary:data.salary, skills:data.skills.split(",").map(s=>s.trim()).filter(Boolean),
+        description:data.description
+      } : j);
+      ypToast("Job updated", "success");
+    } else {
+      posted.unshift({
+        id: "posted-" + Date.now(), title:data.title, company:data.company, location:data.location, type:data.type,
+        category:"General", experience:data.experience, salary:data.salary || "To be discussed",
+        posted:new Date().toISOString().slice(0,10),
+        skills:data.skills.split(",").map(s=>s.trim()).filter(Boolean),
+        description:data.description,
+        responsibilities:["Details to be shared during the interview process."],
+        requirements:["As discussed with the hiring team."],
+        benefits:["To be confirmed by employer."],
+        demo:true
+      });
+      ypToast("Job added successfully", "success");
+    }
+    store.set("yp_posted_jobs", posted);
+    ypCloseModal(document.getElementById("job-form-modal"));
+    renderAll();
+  });
+})();
+</script>
+</body>
+</html>
